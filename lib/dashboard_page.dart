@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-// import tambahan
 import 'package:p1/api_service.dart';
 import 'package:p1/auth_service.dart';
 import 'package:p1/delivery_task_model.dart';
 import 'package:p1/login_page.dart';
+import 'package:p1/delivery_detail_page.dart';
+import 'package:p1/qr_scanner_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -106,7 +107,12 @@ class _DashboardPageState extends State<DashboardPage> {
                     subtitle: Text('ID Tugas: ${task.id}'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
-                      // aksi ketika task diketuk
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DeliveryDetailPage(task: task),
+                        ),
+                      );
                     },
                   ),
                 );
@@ -116,6 +122,28 @@ class _DashboardPageState extends State<DashboardPage> {
           // data kosong
           return const Center(child: Text('Tidak ada data pengiriman.'));
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Navigasi ke QR Scanner
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const QRScannerPage()),
+          );
+          // Tampilkan kode SCAN dalam SnackBar
+          if (result != null && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Paket terdeteksi: $result')),
+            );
+          }
+          // Untuk sekarang, kita hanya menampilkan hasilnya.
+          // Kode petik diatas di alter 'task' dari FutureBuilder
+          // jika ingin update/filter data berdasarkan QR, manipulasi
+          // state menjadi StatefulWidget dan refetch jika perlu
+        },
+        backgroundColor: Colors.blueAccent,
+        tooltip: 'Pindai QR',
+        child: const Icon(Icons.qr_code_scanner),
       ),
     );
   }
